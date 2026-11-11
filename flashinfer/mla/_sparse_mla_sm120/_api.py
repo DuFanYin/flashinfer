@@ -1076,7 +1076,7 @@ class _SparseMLAPagedAttentionRunner:
         is rounded to BF16 before FP32 inverse RoPE and FP8 quantization.
         The caller handles Q normalization and learned projections.
 
-        Requires backend="sparse" and an FP8 cache; full-BF16 attention plans are unsupported.
+        Requires backend="sparse"; full-BF16 attention plans are unsupported.
         Other keyword arguments follow ``run``, including sinks, sparse
         lengths, extra cache and LSE. Warm up before CUDA graph capture;
         replay reads the current positions and sparse inputs.
@@ -1084,8 +1084,6 @@ class _SparseMLAPagedAttentionRunner:
         """
         if self._backend != "sparse":
             raise ValueError("run_mega requires backend='sparse'")
-        if self._kv_cache_format != "fp8":
-            raise ValueError("run_mega requires an FP8 cache")
         if q.ndim != 3 or q.shape[-1] != 512 or self._d_v != 512:
             raise ValueError("run_mega requires q [T,H,512] and d_v=512")
         if output.dtype != torch.float8_e4m3fn:
